@@ -1,0 +1,9 @@
+[Unit]
+Description=Amazon Packages MQTT timer
+
+[Timer]
+OnCalendar=*:0/1
+Unit=space-weather-mqtt.service
+
+[Install]
+WantedBy=timers.target
