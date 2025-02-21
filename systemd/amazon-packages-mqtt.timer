@@ -3,7 +3,7 @@ Description=Amazon Packages MQTT timer
 
 [Timer]
 OnCalendar=*:0/1
-Unit=space-weather-mqtt.service
+Unit=amazon-packages-mqtt.service
 
 [Install]
 WantedBy=timers.target
