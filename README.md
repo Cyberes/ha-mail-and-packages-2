@@ -43,14 +43,14 @@ mqtt:
       state_class:           measurement
       unique_id:             amazon_arriving_count
       unit_of_measurement:   "packages"
+    - name:                  "Amazon Delivered Count"
+      state_topic:           "amazon-packages/amazon-delivered-count"
+      json_attributes_topic: "amazon-packages/amazon-delivered-count/attributes"
+      state_class:           measurement
+      unique_id:             amazon_delivered_count
+      unit_of_measurement:   "packages"
 
 sensor:
-  - name:                  "Amazon Delivered Count"
-    state_topic:           "amazon-packages/amazon-delivered-count"
-    json_attributes_topic: "amazon-packages/amazon-delivered-count/attributes"
-    state_class:           measurement
-    unique_id:             amazon_delivered_count
-    unit_of_measurement:   "packages"
   - platform: template
     sensors:
       amazon_packages_items:

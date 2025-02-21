@@ -5,9 +5,9 @@ After=network.target
 [Service]
 Type=simple
 User=homeassistant
-WorkingDirectory=/srv/ha-amazon-packages/feeder
+WorkingDirectory=/srv/ha-amazon-packages
 EnvironmentFile=/etc/secrets/amazon-packages
-ExecStart=/srv/ha-amazon-packages/feeder/venv/bin/python /srv/ha-amazon-packages/feeder/cache.py
+ExecStart=/srv/ha-amazon-packages/venv/bin/python /srv/ha-amazon-packages/cache.py
 SyslogIdentifier=amazon-packages-cache
 Restart=always
 

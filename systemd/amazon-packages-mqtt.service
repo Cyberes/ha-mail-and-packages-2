@@ -6,7 +6,7 @@ After=network.target amazon-packages-cache.service
 Type=simple
 User=homeassistant
 EnvironmentFile=/etc/secrets/amazon-packages
-ExecStart=/srv/ha-amazon-packages/feeder/venv/bin/python /srv/ha-amazon-packages/feeder/mqtt.py
+ExecStart=/srv/ha-amazon-packages/venv/bin/python /srv/ha-amazon-packages/mqtt.py
 SyslogIdentifier=amazon-packages-mqtt
 Restart=on-failure
 
