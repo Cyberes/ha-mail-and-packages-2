@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=homeassistant
+WorkingDirectory=/srv/ha-mail-and-packages-2/feeder
 EnvironmentFile=/etc/secrets/mail-and-packages
 ExecStart=/srv/ha-mail-and-packages-2/feeder/venv/bin/python /srv/ha-mail-and-packages-2/feeder/cache.py
 SyslogIdentifier=amazon-packages-cache

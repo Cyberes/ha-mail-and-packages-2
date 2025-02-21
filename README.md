@@ -10,7 +10,7 @@ having issues with this and decided to write my own version.
 
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
 parsing an IMAP inbox. It runs on an external server (not Home Assistant) and sends data via MQTT rather than as a
-custom component due to python dependencies.
+custom component due to python dependencies (`amazoncaptcha` requires a specific version of Pillow).
 
 Two-Step verification will interfere with the automated login to Amazon.
 
