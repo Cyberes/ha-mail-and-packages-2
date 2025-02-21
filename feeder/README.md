@@ -11,16 +11,16 @@ Add this to your `configuration.yaml`:
 mqtt:
   sensor:
     - name:                  "Amazon Arriving Count"
-      state_topic:           "mail-and-packages-2/amazon-arriving-count"
-      json_attributes_topic: "mail-and-packages-2/amazon-arriving-count/attributes"
+      state_topic:           "amazon-packages/amazon-arriving-count"
+      json_attributes_topic: "amazon-packages/amazon-arriving-count/attributes"
       state_class:           measurement
       unique_id:             amazon_arriving_count
       unit_of_measurement:   "packages"
 
 sensor:
   - name:                  "Amazon Delivered Count"
-    state_topic:           "mail-and-packages-2/amazon-delivered-count"
-    json_attributes_topic: "mail-and-packages-2/amazon-delivered-count/attributes"
+    state_topic:           "amazon-packages/amazon-delivered-count"
+    json_attributes_topic: "amazon-packages/amazon-delivered-count/attributes"
     state_class:           measurement
     unique_id:             amazon_delivered_count
     unit_of_measurement:   "packages"

@@ -1,16 +1,10 @@
-# ha-mail-and-packages
+# ha-amazon-packages
 
-_Home Assistant integration giving you a quick summary of what's getting delivered today._
-
-A simpler version
-of [moralmunky/Home-Assistant-Mail-And-Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages). I was
-having issues with this and decided to write my own version.
-
-#### Amazon
+_Home Assistant integration giving you a quick summary of what Amazon is delivering today. _
 
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
-parsing an IMAP inbox. It runs on an external server (not Home Assistant) and sends data via MQTT rather than as a
-custom component due to python dependencies (`amazoncaptcha` requires a specific version of Pillow).
+parsing an IMAP inbox. It runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
+rather than as a because the dependencies require a specific version of Pillow.
 
 Two-Step verification will interfere with the automated login to Amazon.
 
