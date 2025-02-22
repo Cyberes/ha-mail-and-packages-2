@@ -37,18 +37,18 @@ Add this to your `configuration.yaml`:
 ```yaml
 mqtt:
   sensor:
-    - name:                  "Amazon Arriving Count"
-      state_topic:           "amazon-packages/amazon-arriving-count"
+    - name: "Amazon Arriving Count"
+      state_topic: "amazon-packages/amazon-arriving-count"
       json_attributes_topic: "amazon-packages/amazon-arriving-count/attributes"
-      state_class:           measurement
-      unique_id:             amazon_arriving_count
-      unit_of_measurement:   "packages"
-    - name:                  "Amazon Delivered Count"
-      state_topic:           "amazon-packages/amazon-delivered-count"
+      state_class: measurement
+      unique_id: amazon_arriving_count
+      unit_of_measurement: "packages"
+    - name: "Amazon Delivered Count"
+      state_topic: "amazon-packages/amazon-delivered-count"
       json_attributes_topic: "amazon-packages/amazon-delivered-count/attributes"
-      state_class:           measurement
-      unique_id:             amazon_delivered_count
-      unit_of_measurement:   "packages"
+      state_class: measurement
+      unique_id: amazon_delivered_count
+      unit_of_measurement: "packages"
 
 sensor:
   - platform: template
@@ -60,4 +60,18 @@ sensor:
           {% set attrs = state_attr('sensor.amazon_arriving_count', 'items') %}
           {{ attrs | join(', ') if attrs else 'No packages' }}
 
+```
+
+### Dashboard Card
+
+An improved dashboard card is included.
+
+```yaml
+type: custom:improved-package-card
+```
+
+To add a title:
+
+```yaml
+title: Incoming Packages
 ```
