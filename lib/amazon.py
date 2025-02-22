@@ -79,6 +79,6 @@ def get_amazon_packages_arriving_today(username: str, password: str):
                     delivered_today += 1
                 else:
                     arriving_today += 1
-                    items_arriving_today.extend([x.title[:22] + '...' for x in item.items])
+            items_arriving_today.extend([x.title[:22] + '...' for x in item.items])
 
     return arriving_today, delivered_today, items_arriving_today

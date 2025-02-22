@@ -4,7 +4,7 @@ _Home Assistant integration giving you a quick summary of what Amazon is deliver
 
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
 parsing an IMAP inbox. It runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
-rather than as a because the dependencies require a specific version of Pillow.
+ because the dependencies require a specific version of Pillow.
 
 Two-Step verification will interfere with the automated login to Amazon.
 
