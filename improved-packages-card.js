@@ -16,9 +16,9 @@ class PackageTrackerCard extends HTMLElement {
         const amazonArriving = parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0;
         const amazonItems = hass.states['sensor.amazon_arriving_count']?.attributes.items || '';
         let amazonPackageStr;
-        let amazonPackageItemsStr;
+        let amazonPackageItemsStr = "";
         if (amazonArriving === 0) {
-            amazonPackageStr = `<div class="improved-packages-counts improved-packages-no-packages-str">no packages</div>`;
+            amazonPackageStr = `<div class="improved-packages-counts">no packages</div>`;
         } else {
             amazonPackageStr = `<div class="improved-packages-counts">${amazonDelivered}/${amazonArriving}</div>`;
             amazonPackageItemsStr = `
@@ -30,12 +30,12 @@ class PackageTrackerCard extends HTMLElement {
         }
 
         const uspsDelivered = parseInt(hass.states['sensor.mail_usps_delivered']?.state) || 0;
-        const uspsDelivering = parseInt(hass.states['sensor.mail_usps_delivering']?.state) || 0;
+        const uspsArriving = parseInt(hass.states['sensor.mail_usps_delivering']?.state) || 0;
         let uspsPackageStr
-        if (uspsDelivering === 0) {
-            uspsPackageStr = `<div class="improved-packages-counts improved-packages-no-packages-str">no packages</div>`
+        if (uspsArriving === 0) {
+            uspsPackageStr = `<div class="improved-packages-counts">no packages</div>`
         } else {
-            uspsPackageStr = `<div class="improved-packages-counts">${uspsDelivered}/${uspsDelivering}</div>`
+            uspsPackageStr = `<div class="improved-packages-counts">${uspsDelivered}/${uspsArriving}</div>`
         }
 
         const fedexDelivered = hass.states['sensor.fedex_delivered']
@@ -96,11 +96,11 @@ class PackageTrackerCard extends HTMLElement {
               font-size: 13pt;
             }
             
-            .improved-packages-service-counts {
+            .improved-packages-counts {
               font-size: 16px;
             }
             
-            .improved-packages-service-no-packages-str {
+            .improved-packages-no-packages-str {
               font-style: italic;
               color: var(--secondary-text-color);
             }
@@ -108,6 +108,10 @@ class PackageTrackerCard extends HTMLElement {
             .improved-packages-status-link {
               color: var(--primary-text-color);
               text-decoration: none;
+            }
+            
+            .improved-packages-status-link.improved-packages-no-packages-str {
+              color: var(--secondary-text-color);
             }
             
             .improved-packages-status-link:hover {
@@ -191,7 +195,7 @@ class PackageTrackerCard extends HTMLElement {
                     <div style="margin-bottom:16px">
                         <div class="improved-packages-service">
                             <div class="improved-packages-service-name">Amazon</div>
-                            <a href="https://www.amazon.com/gp/css/order-history" target="_blank" class="improved-packages-status-link">${amazonPackageStr}</a>
+                            <a href="https://www.amazon.com/gp/css/order-history" target="_blank" class="improved-packages-status-link ${amazonArriving === 0 ? 'improved-packages-no-packages-str' : ''}">${amazonPackageStr}</a>
                             ${amazonPackageItemsStr}
                         </div>
                     </div>
@@ -199,7 +203,7 @@ class PackageTrackerCard extends HTMLElement {
                         <div class="improved-packages-service-container">
                             <div class="improved-packages-service">
                                 <div class="improved-packages-service-name">USPS</div>
-                                ${uspsPackageStr}
+                            <a href="https://informeddelivery.usps.com/box/pages/secure/DashboardAction_input.action" target="_blank" class="improved-packages-status-link ${uspsArriving === 0 ? 'improved-packages-no-packages-str' : ''}">${uspsPackageStr}</a>
                             </div>
 
                             <div class="improved-packages-service">
