@@ -25,7 +25,7 @@ def main():
         logging.info('Fetching latest Amazon order status')
         amazon_packages_count, amazon_delivered_today, amazon_packages_items = get_amazon_packages_arriving_today(AMAZON_USERNAME, AMAZON_PASSWORD)
         redis.set('amazon_packages', pickle.dumps((amazon_packages_count, amazon_delivered_today, amazon_packages_items)))
-        logging.info(f'{amazon_packages_count} Amazon packages arriving today, {amazon_delivered_today} Amazon packages delivered')
+        logging.info(f'{amazon_packages_count} arriving today, {amazon_delivered_today} delivered')
         time.sleep(1800)  # 30 minutes
 
 

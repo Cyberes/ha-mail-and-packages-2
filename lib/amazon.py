@@ -69,9 +69,9 @@ def get_amazon_packages_arriving_today(username: str, password: str):
 
     for order in orders:
         for item in order.shipments:
-            status = item.delivery_status
-            status_str = status.split(' ')[0].lower()
-            if status_str in ['return', 'refunded']:
+            status = item.delivery_status.lower()
+            status_str = status.split(' ')[0]
+            if status_str in ['return', 'refunded'] or 'running late' in status:
                 continue
             delivery_date = relative_date_to_date(status)
             if delivery_date == date.today():
