@@ -1,6 +1,6 @@
 # ha-amazon-packages
 
-_Home Assistant integration giving you a quick summary of what Amazon is delivering today. _
+_Home Assistant integration giving you a quick summary of what Amazon is delivering today._
 
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
 parsing an IMAP inbox. It runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
