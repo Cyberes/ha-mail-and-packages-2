@@ -13,7 +13,10 @@ class PackageTrackerCard extends HTMLElement {
 
     set hass(hass) {
         const amazonDelivered = parseInt(hass.states['sensor.amazon_delivered_count']?.state) || 0;
-        const amazonArriving = parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0;
+
+        // Add the number of arriving packages to the delivered ones so we get a correct n/N number.
+        const amazonArriving = (parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0) + amazonDelivered;
+
         const amazonItems = hass.states['sensor.amazon_arriving_count']?.attributes.items || '';
         let amazonPackageStr;
         let amazonPackageItemsStr = "";
@@ -30,7 +33,7 @@ class PackageTrackerCard extends HTMLElement {
         }
 
         const uspsDelivered = parseInt(hass.states['sensor.mail_usps_delivered']?.state) || 0;
-        const uspsArriving = parseInt(hass.states['sensor.mail_usps_delivering']?.state) || 0;
+        const uspsArriving = (parseInt(hass.states['sensor.mail_usps_delivering']?.state) || 0) + uspsDelivered;
         let uspsPackageStr
         if (uspsArriving === 0) {
             uspsPackageStr = `<div class="improved-packages-counts">no packages</div>`
@@ -38,30 +41,22 @@ class PackageTrackerCard extends HTMLElement {
             uspsPackageStr = `<div class="improved-packages-counts">${uspsDelivered}/${uspsArriving}</div>`
         }
 
-        const fedexDelivered = hass.states['sensor.fedex_delivered']
-            ? parseInt(hass.states['sensor.fedex_delivered']?.state)
-            : 0;
-        const fedexDelivering = hass.states['sensor.fedex_delivering']
-            ? parseInt(hass.states['sensor.fedex_delivering']?.state)
-            : 0;
+        const fedexDelivered = parseInt(hass.states['sensor.mail_fedex_delivered']?.state) || 0;
+        const fedexArriving = (parseInt(hass.states['sensor.mail_fedex_delivering']?.state) || 0) + fedexDelivered;
         let fedexPackageStr
-        if (fedexDelivering === 0) {
+        if (fedexArriving === 0) {
             fedexPackageStr = `<div class="improved-packages-counts improved-packages-no-packages-str">no packages</div>`
         } else {
-            fedexPackageStr = `<div class="improved-packages-counts">${fedexDelivered}/${fedexDelivering}</div>`
+            fedexPackageStr = `<div class="improved-packages-counts">${fedexDelivered}/${fedexArriving}</div>`
         }
 
-        const upsDelivered = hass.states['sensor.ups_delivered']
-            ? parseInt(hass.states['sensor.ups_delivered']?.state)
-            : 0;
-        const upsDelivering = hass.states['sensor.ups_delivering']
-            ? parseInt(hass.states['sensor.ups_delivering']?.state)
-            : 0;
+        const upsDelivered = parseInt(hass.states['sensor.mail_ups_delivered']?.state) || 0;
+        const upsArriving = (parseInt(hass.states['sensor.mail_ups_delivering']?.state) || 0) + upsDelivered;
         let upsPackageStr
-        if (upsDelivering === 0) {
+        if (upsArriving === 0) {
             upsPackageStr = `<div class="improved-packages-counts improved-packages-no-packages-str">no packages</div>`
         } else {
-            upsPackageStr = `<div class="improved-packages-counts">${upsDelivered}/${upsDelivering}</div>`
+            upsPackageStr = `<div class="improved-packages-counts">${upsDelivered}/${upsArriving}</div>`
         }
 
         this.innerHTML = `
