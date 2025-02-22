@@ -17,7 +17,7 @@ class PackageTrackerCard extends HTMLElement {
         // Add the number of arriving packages to the delivered ones so we get a correct n/N number.
         const amazonArriving = (parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0) + amazonDelivered;
 
-        const amazonItems = hass.states['sensor.amazon_arriving_count']?.attributes.items || '';
+        const amazonItems = (hass.states['sensor.amazon_arriving_count']?.attributes.items || []).join(', ');
         let amazonPackageStr;
         let amazonPackageItemsStr = "";
         if (amazonArriving === 0) {
@@ -65,62 +65,62 @@ class PackageTrackerCard extends HTMLElement {
               padding: 16px;
               box-sizing: border-box;
             }
-            
+
             .improved-packages-header {
               font-size: 20px;
               font-weight: 500;
               margin-bottom: 2px;
               text-align: center;
             }
-            
+
             .improved-packages-service-container {
               display: flex;
               justify-content: space-around;
               flex-wrap: wrap;
               gap: 16px;
             }
-            
+
             .improved-packages-service {
               flex: 1 1 100px;
               text-align: center;
             }
-            
+
             .improved-packages-service-name {
               font-weight: 600;
               margin-bottom: 8px;
               font-size: 13pt;
             }
-            
+
             .improved-packages-counts {
               font-size: 16px;
             }
-            
+
             .improved-packages-no-packages-str {
               font-style: italic;
               color: var(--secondary-text-color);
             }
-            
+
             .improved-packages-status-link {
               color: var(--primary-text-color);
               text-decoration: none;
             }
-            
+
             .improved-packages-status-link.improved-packages-no-packages-str {
               color: var(--secondary-text-color);
             }
-            
+
             .improved-packages-status-link:hover {
               color: var(--primary-color);
               text-decoration: underline;
               font-weight: bold;
             }
-            
+
             .improved-packages-amazon-items {
               position: relative;
               display: block;
               width: 100%;
             }
-            
+
             .improved-packages-amazon-items-list {
               position: absolute;
               top: 100%;
@@ -139,12 +139,12 @@ class PackageTrackerCard extends HTMLElement {
               text-align: center;
               box-sizing: border-box;
             }
-            
+
             .improved-packages-amazon-items-list.show {
               transform: scaleY(1);
               visibility: visible;
             }
-            
+
             .improved-packages-toggle-items-btn {
               background: none;
               border: none;
@@ -156,7 +156,7 @@ class PackageTrackerCard extends HTMLElement {
               display: inline-flex;
               align-items: center;
             }
-            
+
             .improved-packages-toggle-items-btn::after {
               content: "";
               display: inline-block;
@@ -169,11 +169,11 @@ class PackageTrackerCard extends HTMLElement {
               border-left: 4px solid transparent;
               transition: transform 0.1s ease;
             }
-            
+
             .improved-packages-toggle-items-btn.open::after {
               transform: rotate(180deg);
             }
-            
+
             @media (min-width: 600px) {
               .improved-packages-service-container {
                 flex-wrap: nowrap;

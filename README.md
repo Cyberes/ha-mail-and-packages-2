@@ -10,21 +10,6 @@ Two-Step verification will interfere with the automated login to Amazon.
 
 See `README.md` in `feeder/`.
 
-Dashboard card:
-
-```yaml
-type: markdown
-content: >
-  **Delivered:** {{ states('sensor.amazon_delivered_count') | int }}/{{
-  states('sensor.amazon_arriving_count') | int }}
-
-
-  **Items:** {{ states('sensor.amazon_packages_items') }}
-
-
-  [Orders Page](https://www.amazon.com/gp/css/order-history)
-```
-
 ## Install
 
 1. `pip install -r requirements.txt`
@@ -49,17 +34,6 @@ mqtt:
       state_class: measurement
       unique_id: amazon_delivered_count
       unit_of_measurement: "packages"
-
-sensor:
-  - platform: template
-    sensors:
-      amazon_packages_items:
-        friendly_name: "Amazon Package Details"
-        unique_id: amazon_package_items
-        value_template: >
-          {% set attrs = state_attr('sensor.amazon_arriving_count', 'items') %}
-          {{ attrs | join(', ') if attrs else 'No packages' }}
-
 ```
 
 ### Dashboard Card
