@@ -32,8 +32,8 @@ class PackageTrackerCard extends HTMLElement {
             `;
         }
 
-        const uspsDelivered = parseInt(hass.states['sensor.mail_usps_delivered']?.state) || 0;
-        const uspsArriving = (parseInt(hass.states['sensor.mail_usps_delivering']?.state) || 0) + uspsDelivered;
+        const uspsDelivered = parseInt(hass.states['sensor.usps_delivered_count']?.state) || 0;
+        const uspsArriving = (parseInt(hass.states['sensor.usps_arriving_count']?.state) || 0) + uspsDelivered;
         let uspsPackageStr
         if (uspsArriving === 0) {
             uspsPackageStr = `<div class="improved-packages-counts">no packages</div>`

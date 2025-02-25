@@ -2,6 +2,12 @@
 
 _Home Assistant integration giving you a quick summary of what is being delivered today._
 
+An improved and simplified version
+of [moralmunky/Home-Assistant-Mail-And-Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages). I was
+having endless issues, so I wrote my own package summary addon.
+
+### Amazon
+
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
 parsing an IMAP inbox. It runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
 because the dependencies require a specific version of Pillow.
@@ -9,6 +15,13 @@ because the dependencies require a specific version of Pillow.
 Two-Step verification will interfere with the automated login to Amazon.
 
 See `README.md` in `feeder/`.
+
+### USPS
+
+Set up Informed Delivery according
+to [these instructions](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Supported-Shipper-Requirements).
+All package emails should go into one folder. The subject line of all USPS emails is parsed for delivery status and
+arrival date.
 
 ## Install
 
