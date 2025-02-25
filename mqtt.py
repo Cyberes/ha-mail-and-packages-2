@@ -43,14 +43,18 @@ def publish(topic: str, msg: str, attributes: dict = None):
 
 def main():
     redis = Redis(host='localhost', port=6379, db=0)
-    data = redis.get('amazon_packages')
-    while data is None:
+    amazon_data = redis.get('amazon_packages')
+    usps_data = redis.get('usps_packages')
+    while amazon_data is None or usps_data is None:
         logging.warning('Redis has not been populated yet. Is cache.py running? Sleeping 10s...')
         time.sleep(10)
-        data = redis.get('amazon_packages')
-    amazon_packages_count, amazon_delivered_today, amazon_packages_items = pickle.loads(data)
-    publish('amazon-arriving-count', amazon_packages_count, attributes={'items': amazon_packages_items})
-    publish('amazon-delivered-count', amazon_delivered_today)
+        amazon_data = redis.get('amazon_packages')
+    amazon_arriving_count, amazon_delivered_count, amazon_packages_items = pickle.loads(amazon_data)
+    publish('amazon-arriving-count', amazon_arriving_count, attributes={'items': amazon_packages_items})
+    publish('amazon-delivered-count', amazon_delivered_count)
+    usps_arriving_count, usps_delivered_count = pickle.loads(usps_data)
+    publish('usps-arriving-count', usps_arriving_count)
+    publish('usps-delivered-count', usps_delivered_count)
 
 
 if __name__ == '__main__':

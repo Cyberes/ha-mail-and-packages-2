@@ -2,3 +2,6 @@ pydantic==2.10.6
 paho-mqtt==1.5.0
 amazon-orders
 redis==5.2.1
+chromedriver_autoinstaller==0.6.4
+undetected-chromedriver==3.5.5
+webdriver-manager==4.0.2
