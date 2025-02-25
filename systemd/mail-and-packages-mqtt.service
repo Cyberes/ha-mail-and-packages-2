@@ -1,0 +1,14 @@
+[Unit]
+Description=Amazon Packages MQTT
+After=network.target mail-and-packages-cache.service
+
+[Service]
+Type=simple
+User=homeassistant
+EnvironmentFile=/etc/secrets/mail-and-packages
+ExecStart=/srv/ha-mail-and-packges-2/venv/bin/python /srv/ha-mail-and-packges-2/mqtt.py
+SyslogIdentifier=mail-and-packages-mqtt
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

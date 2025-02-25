@@ -1,0 +1,9 @@
+[Unit]
+Description=Mail and Packages 2 MQTT timer
+
+[Timer]
+OnCalendar=*:0/1
+Unit=mail-and-packages-mqtt.service
+
+[Install]
+WantedBy=timers.target

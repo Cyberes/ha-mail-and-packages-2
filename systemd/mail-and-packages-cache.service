@@ -1,0 +1,15 @@
+[Unit]
+Description=Mail and Packages 2 Cache
+After=network.target
+
+[Service]
+Type=simple
+User=homeassistant
+WorkingDirectory=/srv/ha-mail-and-packges-2
+EnvironmentFile=/etc/secrets/mail-and-packages
+ExecStart=/srv/ha-mail-and-packges-2/venv/bin/python /srv/ha-mail-and-packges-2/cache.py
+SyslogIdentifier=mail-and-packages-cache
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
