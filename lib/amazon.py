@@ -25,6 +25,14 @@ def relative_date_to_date(text: str) -> date:
         except ValueError:
             pass
 
+    elif 'arriving' in text_lower:
+        # Handle the "arriving" date range
+        date_range = text_lower.replace('arriving', '').strip()
+        start_date_str, end_date_str = date_range.split('-')
+        start_date = datetime.strptime(start_date_str.strip(), '%B %d').date()
+        start_date = start_date.replace(year=today.year)
+        return start_date
+
     else:
         weekdays = {
             'monday': 0,
