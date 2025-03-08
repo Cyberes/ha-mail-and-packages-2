@@ -29,7 +29,6 @@ if not IMAP_HOST or not IMAP_USERNAME or not IMAP_PASSWORD or not IMAP_FOLDER:
 
 def main():
     redis = Redis(host='localhost', port=6379, db=0)
-    redis.flushall()
     while True:
         # logging.info('Fetching USPS tracking data')
         # IMAPConnection.initialise(IMAP_HOST, IMAP_USERNAME, IMAP_PASSWORD)
