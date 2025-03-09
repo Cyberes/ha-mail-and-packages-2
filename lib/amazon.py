@@ -66,26 +66,31 @@ def get_amazon_session(username: str, password: str) -> AmazonSession:
     s_bytes: bytes = _REDIS.get('amazon_session')
     if s_bytes is not None:
         _LOGGER.info('Loaded cached Amazon session')
-        return pickle.loads(s_bytes)
+        amazon_session = pickle.loads(s_bytes)
     else:
-        s = AmazonSession(username, password)
+        amazon_session = AmazonSession(username, password)
         # TODO: https://github.com/alexdlaird/amazon-orders/issues/49
-        _REDIS.set('amazon_session', pickle.dumps(s))
-        _LOGGER.info('Created and cached new Amazon session')
-        return s
+        _LOGGER.info('Created new Amazon session')
+
+    if not amazon_session.is_authenticated:
+        _LOGGER.info('Logging into Amazon...')
+        try:
+            amazon_session.login()
+            _LOGGER.info('Logged into Amazon successfully.')
+        except Exception as e:
+            _LOGGER.error(f'Failed to log into Amazon: {e}')
+            sys.exit(1)
+    else:
+        _LOGGER.info('Amazon session already authenticated')
+
+    _REDIS.set('amazon_session', pickle.dumps(amazon_session))
+    _LOGGER.info('Cached Amazon session')
+
+    return amazon_session
 
 
 def get_amazon_packages_arriving_today(username: str, password: str):
     amazon_session = get_amazon_session(username, password)
-
-    if not amazon_session.is_authenticated:
-        try:
-            amazon_session.login()
-            logging.info("Logged into Amazon successfully.")
-        except Exception as e:
-            logging.error(f"Failed to log into Amazon: {e}")
-            sys.exit(1)
-
     amazon_orders = AmazonOrders(amazon_session)
     try:
         orders = amazon_orders.get_order_history(year=date.today().year)
