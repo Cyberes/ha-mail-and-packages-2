@@ -74,13 +74,14 @@ def get_amazon_session(username: str, password: str) -> AmazonSession:
 
 def get_amazon_packages_arriving_today(username: str, password: str):
     amazon_session = get_amazon_session(username, password)
-
-    try:
-        amazon_session.login()
-        logging.info("Logged into Amazon successfully.")
-    except Exception as e:
-        logging.error(f"Failed to log into Amazon: {e}")
-        sys.exit(1)
+    
+    if not amazon_session.is_authenticated:
+        try:
+            amazon_session.login()
+            logging.info("Logged into Amazon successfully.")
+        except Exception as e:
+            logging.error(f"Failed to log into Amazon: {e}")
+            sys.exit(1)
 
     amazon_orders = AmazonOrders(amazon_session)
     try:
