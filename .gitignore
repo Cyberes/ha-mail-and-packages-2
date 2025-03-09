@@ -1,4 +1,4 @@
-*.sh
+test-*
 
 .idea
 output/

@@ -1,5 +1,5 @@
 import email
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from lib.imap.connection import IMAPConnectionHandler
 from lib.imap.email import Email
@@ -7,6 +7,9 @@ from lib.imap.email import Email
 
 def fetch_emails_last_3_days(sender: str = None, folder: str = None):
     since_date = (datetime.now() - timedelta(days=3)).strftime("%d-%b-%Y")
+
+    # TODO: remove once working
+    since_date = date(2025, 3, 3).strftime("%d-%b-%Y")
 
     with IMAPConnectionHandler(folder) as conn:
         search_criteria = f'(SINCE "{since_date}")'

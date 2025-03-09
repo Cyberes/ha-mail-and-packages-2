@@ -6,29 +6,28 @@ An improved and simplified version
 of [moralmunky/Home-Assistant-Mail-And-Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages). I was
 having endless issues, so I wrote my own package summary addon.
 
+Runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
+because the dependencies require a specific version of Pillow.
+
 ### Amazon
 
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
-parsing an IMAP inbox. It runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
-because the dependencies require a specific version of Pillow.
+parsing an IMAP inbox.
 
 Two-Step verification will interfere with the automated login to Amazon.
 
-See `README.md` in `feeder/`.
+### parcelsapp.com
 
-### USPS
-
-Set up Informed Delivery according
-to [these instructions](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Supported-Shipper-Requirements).
-All package emails should go into one folder. The subject line of all USPS emails is parsed for delivery status and
-arrival date.
+[parcelsapp.com](https://parcelsapp.com) is used to track all other package providers. Create an account and subscribe
+at [parcelsapp.com/dashboard](https://parcelsapp.com/dashboard).
 
 ## Install
 
 1. `pip install -r requirements.txt`
-2. `sudo apt-get install redis-server xvfb`
+2. `sudo apt-get install redis-server`
 3. `sudo systemctl enable --now redis-server`
-4. Start the systemd services. Examples are provided in `systemd/`
+4. Enter your environment variables in `/etc/secrets/mail-and-packages`.
+5. Start the systemd services.
 
 Add this to your `configuration.yaml`:
 

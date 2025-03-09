@@ -26,12 +26,13 @@ def relative_date_to_date(text: str) -> date:
             pass
 
     elif 'arriving' in text_lower:
-        # Handle the "arriving" date range
-        date_range = text_lower.replace('arriving', '').strip()
-        start_date_str, end_date_str = date_range.split('-')
-        start_date = datetime.strptime(start_date_str.strip(), '%B %d').date()
-        start_date = start_date.replace(year=today.year)
-        return start_date
+        if 'overnight' in text_lower:
+            start_date = datetime.today() + timedelta(days=1)
+        else:
+            # Handle the "arriving" date range
+            date_range = text_lower.replace('arriving', '').strip()
+            start_date_str, end_date_str = date_range.split('-')
+            return datetime.strptime(start_date_str.strip(), '%B %d').date().replace(year=today.year)
 
     else:
         weekdays = {
