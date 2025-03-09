@@ -7,8 +7,8 @@ from amazonorders.orders import AmazonOrders
 from amazonorders.session import AmazonSession
 from redis import Redis
 
-_redis = Redis(host='localhost', port=6379, db=0)
-_logger = logging.getLogger('AMAZON')
+_REDIS = Redis(host='localhost', port=6379, db=0)
+_LOGGER = logging.getLogger('AMAZON')
 
 
 def relative_date_to_date(text: str) -> date | None:
@@ -60,15 +60,15 @@ def relative_date_to_date(text: str) -> date | None:
 
 
 def get_amazon_session(username: str, password: str) -> AmazonSession:
-    s_bytes: bytes = _redis.get('amazon_session')
+    s_bytes: bytes = _REDIS.get('amazon_session')
     if s_bytes is not None:
-        _logger.info('Loaded cached Amazon session')
+        _LOGGER.info('Loaded cached Amazon session')
         return pickle.loads(s_bytes)
     else:
         s = AmazonSession(username, password)
         # TODO: https://github.com/alexdlaird/amazon-orders/issues/49
-        # _redis.set('amazon_session', pickle.dumps(s))
-        _logger.info('Created and cached new Amazon session')
+        _REDIS.set('amazon_session', pickle.dumps(s))
+        _LOGGER.info('Created and cached new Amazon session')
         return s
 
 
