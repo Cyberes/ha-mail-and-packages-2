@@ -67,7 +67,7 @@ def get_amazon_session(username: str, password: str) -> AmazonSession:
     else:
         s = AmazonSession(username, password)
         # TODO: https://github.com/alexdlaird/amazon-orders/issues/49
-        _redis.set('amazon_session', pickle.dumps(s))
+        # _redis.set('amazon_session', pickle.dumps(s))
         _logger.info('Created and cached new Amazon session')
         return s
 
