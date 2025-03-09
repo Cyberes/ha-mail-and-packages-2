@@ -1,6 +1,7 @@
 import logging
 import pickle
 import sys
+import traceback
 from datetime import date, timedelta, datetime
 
 from amazonorders.orders import AmazonOrders
@@ -29,14 +30,16 @@ def relative_date_to_date(text: str) -> date | None:
             return delivered_date
         except ValueError:
             pass
-
-    elif 'arriving' in text_lower:
+    elif 'arriving' in text_lower and len(text_lower.split(' ')) > 2:
         if 'overnight' in text_lower:
             return datetime.today() + timedelta(days=1)
         else:
             date_range = text_lower.replace('arriving', '').strip()
             start_date_str = date_range.split('-')[0]
-            return datetime.strptime(start_date_str.strip(), '%B %d').date().replace(year=today.year)
+            try:
+                return datetime.strptime(start_date_str.strip(), '%B %d').date().replace(year=today.year)
+            except ValueError:
+                raise ValueError(f'Failed to parse date: "{text_lower}"\n{traceback.format_exc()}')
     elif text_lower == 'cannot display current status':
         return None
     else:
@@ -74,7 +77,7 @@ def get_amazon_session(username: str, password: str) -> AmazonSession:
 
 def get_amazon_packages_arriving_today(username: str, password: str):
     amazon_session = get_amazon_session(username, password)
-    
+
     if not amazon_session.is_authenticated:
         try:
             amazon_session.login()

@@ -14,7 +14,8 @@ because the dependencies require a very specific setup.
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
 parsing an IMAP inbox.
 
-Two-Step verification will interfere with the automated login to Amazon.
+Two-Step verification will interfere with the automated login to Amazon. Amazon seems to be pretty lenient regarding
+bots.
 
 ### parcelsapp.com
 
