@@ -7,7 +7,7 @@ of [moralmunky/Home-Assistant-Mail-And-Packages](https://github.com/moralmunky/H
 having endless issues, so I wrote my own package summary addon.
 
 Runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
-because the dependencies require a specific version of Pillow.
+because the dependencies require a very specific setup.
 
 ### Amazon
 

@@ -3,7 +3,7 @@ import time
 
 import requests
 
-logger = logging.getLogger('PARCELAPP')
+_logger = logging.getLogger('PARCELAPP')
 
 _API_URL = 'https://parcelsapp.com/api/v3/shipments/tracking'
 
@@ -18,11 +18,11 @@ def fetch_parcel_data(api_key: str, tracking_ids: list):
     post_data = post_response.json()
 
     if post_data.get('error'):
-        logger.error(post_data)
+        _logger.error(post_data)
         return
 
     if post_data.get('uuid'):
-        logger.info('Parcelapp returned a UUID, sleeping 10 seconds and checking if updated...')
+        _logger.info('Parcelapp returned a UUID, sleeping 10 seconds and checking if updated...')
         time.sleep(10)
     else:
         if len(tracking_ids) == 1:

@@ -1,12 +1,17 @@
 import logging
+import pickle
 import sys
 from datetime import date, timedelta, datetime
 
 from amazonorders.orders import AmazonOrders
 from amazonorders.session import AmazonSession
+from redis import Redis
+
+_redis = Redis(host='localhost', port=6379, db=0)
+_logger = logging.getLogger('AMAZON')
 
 
-def relative_date_to_date(text: str) -> date:
+def relative_date_to_date(text: str) -> date | None:
     today = datetime.today()
     text_lower = text.lower()
 
@@ -27,13 +32,13 @@ def relative_date_to_date(text: str) -> date:
 
     elif 'arriving' in text_lower:
         if 'overnight' in text_lower:
-            start_date = datetime.today() + timedelta(days=1)
+            return datetime.today() + timedelta(days=1)
         else:
-            # Handle the "arriving" date range
             date_range = text_lower.replace('arriving', '').strip()
-            start_date_str, end_date_str = date_range.split('-')
+            start_date_str = date_range.split('-')[0]
             return datetime.strptime(start_date_str.strip(), '%B %d').date().replace(year=today.year)
-
+    elif text_lower == 'cannot display current status':
+        return None
     else:
         weekdays = {
             'monday': 0,
@@ -54,8 +59,21 @@ def relative_date_to_date(text: str) -> date:
     raise ValueError(f"Unrecognized date text: '{text}'")
 
 
+def get_amazon_session(username: str, password: str) -> AmazonSession:
+    s_bytes: bytes = _redis.get('amazon_session')
+    if s_bytes is not None:
+        _logger.info('Loaded cached Amazon session')
+        return pickle.loads(s_bytes)
+    else:
+        s = AmazonSession(username, password)
+        # TODO: https://github.com/alexdlaird/amazon-orders/issues/49
+        _redis.set('amazon_session', pickle.dumps(s))
+        _logger.info('Created and cached new Amazon session')
+        return s
+
+
 def get_amazon_packages_arriving_today(username: str, password: str):
-    amazon_session = AmazonSession(username, password)
+    amazon_session = get_amazon_session(username, password)
 
     try:
         amazon_session.login()
