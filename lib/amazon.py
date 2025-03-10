@@ -18,10 +18,8 @@ def relative_date_to_date(text: str) -> date | None:
 
     if 'today' in text_lower:
         return today.date()
-
     elif 'tomorrow' in text_lower:
         return (today + timedelta(days=1)).date()
-
     elif 'delivered' in text_lower:
         date_str = text_lower.replace('delivered', '').strip()
         try:
@@ -58,7 +56,6 @@ def relative_date_to_date(text: str) -> date | None:
                 if days_ahead <= 0:
                     days_ahead += 7
                 return (today + timedelta(days=days_ahead)).date()
-
     raise ValueError(f"Unrecognized date text: '{text}'")
 
 
@@ -69,7 +66,6 @@ def get_amazon_session(username: str, password: str) -> AmazonSession:
         amazon_session = pickle.loads(s_bytes)
     else:
         amazon_session = AmazonSession(username, password)
-        # TODO: https://github.com/alexdlaird/amazon-orders/issues/49
         _LOGGER.info('Created new Amazon session')
 
     if not amazon_session.is_authenticated:
@@ -83,6 +79,7 @@ def get_amazon_session(username: str, password: str) -> AmazonSession:
     else:
         _LOGGER.info('Amazon session already authenticated')
 
+    # TODO: https://github.com/alexdlaird/amazon-orders/issues/49
     _REDIS.set('amazon_session', pickle.dumps(amazon_session))
     _LOGGER.info('Cached Amazon session')
 
@@ -94,9 +91,9 @@ def get_amazon_packages_arriving_today(username: str, password: str):
     amazon_orders = AmazonOrders(amazon_session)
     try:
         orders = amazon_orders.get_order_history(year=date.today().year)
-        logging.info(f"Fetched {len(orders)} orders from Amazon.")
+        _LOGGER.info(f"Fetched {len(orders)} orders from Amazon.")
     except Exception as e:
-        logging.error(f"Failed to fetch order history: {e}")
+        _LOGGER.error(f"Failed to fetch order history: {e}")
         sys.exit(1)
 
     arriving_today = 0
