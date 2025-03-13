@@ -34,13 +34,10 @@ def main(args):
         if PARCELSAPP_KEY:
             logging.info('Fetching USPS tracking data...')
             IMAPConnection.initialise(IMAP_HOST, IMAP_USERNAME, IMAP_PASSWORD)
-            usps_arriving_today, usps_delivered_today = get_usps_packages_arriving_today(IMAP_FOLDER, PARCELSAPP_KEY, args.usps_mode)
+            usps_arriving_today, usps_delivered_today, usps_recent_tracking_ids = get_usps_packages_arriving_today(IMAP_FOLDER, PARCELSAPP_KEY, args.usps_mode)
             IMAPConnection.close_connection()
-            redis.set('usps_packages', pickle.dumps((usps_arriving_today, usps_delivered_today)))
+            redis.set('usps_packages', pickle.dumps((usps_arriving_today, usps_delivered_today, usps_recent_tracking_ids)))
             logging.info(f'USPS: {usps_arriving_today} arriving, {usps_delivered_today} delivered')
-            # TODO: send tracking numbers to HA so that the dashboard card can link to the tracking page and not have to log in (https://tools.usps.com/go/TrackConfirmAction?tLabels=123%2Casd%2Cabc%2C)
-
-        # return
 
         if AMAZON_USERNAME and AMAZON_PASSWORD:
             logging.info('Fetching Amazon order statuses...')
@@ -48,6 +45,7 @@ def main(args):
             redis.set('amazon_packages', pickle.dumps((amazon_packages_count, amazon_delivered_today, amazon_packages_items)))
             logging.info(f'AMAZON: {amazon_packages_count} arriving, {amazon_delivered_today} delivered')
 
+        logging.info('Sleeping')
         time.sleep(900)  # 15 minutes
 
 

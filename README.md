@@ -68,6 +68,7 @@ mqtt:
       unit_of_measurement: "packages"
     - name: "USPS Arriving Count"
       state_topic: "mail-and-packages-2/usps-arriving-count"
+      json_attributes_topic: "mail-and-packages-2/usps-arriving-count/attributes"
       state_class: measurement
       unique_id: usps_arriving_count
       unit_of_measurement: "packages"

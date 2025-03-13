@@ -1,16 +1,17 @@
 import logging
 import re
-from datetime import date, datetime
 from enum import Enum
-from typing import Optional
 
 from dateutil.parser import parse
-from pydantic import BaseModel, field_validator
 
 from lib.imap.search import fetch_emails_last_3_days
 from lib.parcelsapp import fetch_parcel_data, parcelsapp_get_attr
 
 _LOGGER = logging.getLogger('USPS')
+
+from datetime import date, datetime, timedelta
+from typing import Optional
+from pydantic import BaseModel, field_validator
 
 
 class UspsItem(BaseModel):
@@ -21,8 +22,8 @@ class UspsItem(BaseModel):
     class Config:
         validate_assignment = True
 
-    @classmethod
     @field_validator('arriving_date', 'delivered_date', mode='before')
+    @classmethod
     def convert_datetime_to_date(cls, value):
         if isinstance(value, datetime):
             return value.date()
@@ -38,6 +39,7 @@ def get_usps_packages_arriving_today(folder: str, api_key: str, api_type: str):
     _LOGGER.info('Searching for USPS emails...')
     arriving_today = []
     delivered_today = []
+    recent_tracking_ids = []
     for tracking_id in usps_fetch_items_from_emails(folder):
         if api_type == UspsApiType.parcelsapp.value:
             item = usps_parcel_app(tracking_id, api_key)
@@ -52,7 +54,10 @@ def get_usps_packages_arriving_today(folder: str, api_key: str, api_type: str):
             delivered_today.append(item)
         elif item.arriving_date is not None and item.arriving_date > date.today():
             _LOGGER.info(f'{item.tracking_id} arriving on {item.arriving_date} ({(item.arriving_date - date.today()).days} days)')
-    return len(arriving_today), len(delivered_today)
+        if (item.arriving_date is not None and item.arriving_date >= date.today() - timedelta(days=1)) or \
+                (item.delivered_date is not None and item.delivered_date >= date.today() - timedelta(days=1)):
+            recent_tracking_ids.append(tracking_id)
+    return len(arriving_today), len(delivered_today), recent_tracking_ids
 
 
 def usps_fetch_items_from_emails(folder: str) -> set:
@@ -62,7 +67,6 @@ def usps_fetch_items_from_emails(folder: str) -> set:
         tracking_id = re.search(r'\b(9\d{15,21})\b', email.subject)
         if tracking_id:
             items.add(tracking_id.group(1))
-    items = {'9400108105462561148496', '9300110571012423728705', '9400108105462555931813'}
     return items
 
 

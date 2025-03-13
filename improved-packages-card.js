@@ -13,10 +13,9 @@ class PackageTrackerCard extends HTMLElement {
 
     set hass(hass) {
         const amazonDelivered = parseInt(hass.states['sensor.amazon_delivered_count']?.state) || 0;
-
-        // Add the number of arriving packages to the delivered ones so we get a correct n/N number.
-        const amazonArriving = (parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0) + amazonDelivered;
-
+        const amazonArriving = (parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0)
+            // Add the number of arriving packages to the delivered ones so we get a correct n/N number.
+            + amazonDelivered;
         const amazonItems = (hass.states['sensor.amazon_arriving_count']?.attributes.items || []).join(', ');
         let amazonPackageStr;
         let amazonPackageItemsStr = "";
@@ -34,6 +33,16 @@ class PackageTrackerCard extends HTMLElement {
 
         const uspsDelivered = parseInt(hass.states['sensor.usps_delivered_count']?.state) || 0;
         const uspsArriving = (parseInt(hass.states['sensor.usps_arriving_count']?.state) || 0) + uspsDelivered;
+        const uspsItems = (hass.states['sensor.usps_arriving_count']?.attributes.tracking_ids || []);
+
+        let uspsTrackingUrl;
+        if (uspsArriving === 0) {
+            uspsTrackingUrl = 'https://informeddelivery.usps.com/box/pages/secure/DashboardAction_input.action';
+        } else {
+            const baseUrl = 'https://tools.usps.com/go/TrackConfirmAction?tLabels=';
+            const trackingParam = uspsItems.join('%2C') + '%2C';
+            uspsTrackingUrl = `${baseUrl}${trackingParam}`;
+        }
         let uspsPackageStr
         if (uspsArriving === 0) {
             uspsPackageStr = `<div class="improved-packages-counts">no packages</div>`
@@ -198,7 +207,7 @@ class PackageTrackerCard extends HTMLElement {
                         <div class="improved-packages-service-container">
                             <div class="improved-packages-service">
                                 <div class="improved-packages-service-name">USPS</div>
-                            <a href="https://informeddelivery.usps.com/box/pages/secure/DashboardAction_input.action" target="_blank" class="improved-packages-status-link ${uspsArriving === 0 ? 'improved-packages-no-packages-str' : ''}">${uspsPackageStr}</a>
+                            <a href="${uspsTrackingUrl}" target="_blank" class="improved-packages-status-link ${uspsArriving === 0 ? 'improved-packages-no-packages-str' : ''}">${uspsPackageStr}</a>
                             </div>
 
                             <div class="improved-packages-service">

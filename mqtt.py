@@ -52,8 +52,8 @@ def main():
     amazon_arriving_count, amazon_delivered_count, amazon_packages_items = pickle.loads(amazon_data)
     publish('amazon-arriving-count', amazon_arriving_count, attributes={'items': amazon_packages_items})
     publish('amazon-delivered-count', amazon_delivered_count)
-    usps_arriving_count, usps_delivered_count = pickle.loads(usps_data)
-    publish('usps-arriving-count', usps_arriving_count)
+    usps_arriving_count, usps_delivered_count, usps_recent_tracking_ids = pickle.loads(usps_data)
+    publish('usps-arriving-count', usps_arriving_count, attributes={'tracking_ids': usps_recent_tracking_ids})
     publish('usps-delivered-count', usps_delivered_count)
 
 

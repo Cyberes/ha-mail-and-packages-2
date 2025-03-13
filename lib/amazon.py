@@ -90,6 +90,7 @@ def get_amazon_packages_arriving_today(username: str, password: str):
     amazon_session = get_amazon_session(username, password)
     amazon_orders = AmazonOrders(amazon_session)
     try:
+        _LOGGER.info('Fetching Amazon orders...')
         orders = amazon_orders.get_order_history(year=date.today().year)
         _LOGGER.info(f"Fetched {len(orders)} orders from Amazon.")
     except Exception as e:
