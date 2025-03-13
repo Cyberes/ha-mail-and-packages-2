@@ -38,8 +38,9 @@ class UspsApiType(Enum):
 def get_usps_packages_arriving_today(folder: str, api_key: str, api_type: str):
     _LOGGER.info('Searching for USPS emails...')
     arriving_today = []
+    upcoming_tracking_ids = []
     delivered_today = []
-    recent_tracking_ids = []
+    delivered_tracking_ids = []
     for tracking_id in usps_fetch_items_from_emails(folder):
         if api_type == UspsApiType.parcelsapp.value:
             item = usps_parcel_app(tracking_id, api_key)
@@ -54,10 +55,12 @@ def get_usps_packages_arriving_today(folder: str, api_key: str, api_type: str):
             delivered_today.append(item)
         elif item.arriving_date is not None and item.arriving_date > date.today():
             _LOGGER.info(f'{item.tracking_id} arriving on {item.arriving_date} ({(item.arriving_date - date.today()).days} days)')
-        if (item.arriving_date is not None and item.arriving_date >= date.today() - timedelta(days=1)) or \
-                (item.delivered_date is not None and item.delivered_date >= date.today() - timedelta(days=1)):
-            recent_tracking_ids.append(tracking_id)
-    return len(arriving_today), len(delivered_today), recent_tracking_ids
+
+        if item.delivered_date is not None and item.delivered_date >= date.today() - timedelta(days=1):
+            delivered_tracking_ids.append(tracking_id)
+        elif item.arriving_date is not None and item.arriving_date >= date.today() - timedelta(days=1):
+            upcoming_tracking_ids.append(tracking_id)
+    return len(arriving_today), len(delivered_today), upcoming_tracking_ids + delivered_tracking_ids
 
 
 def usps_fetch_items_from_emails(folder: str) -> set:

@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import pickle
+import sys
 import time
 
 import paho.mqtt.client as mqtt
@@ -9,12 +10,16 @@ from redis import Redis
 
 logging.basicConfig(level=logging.INFO)
 
-MQTT_BROKER_HOST = os.getenv('MQTT_BROKER_HOST', '')
+MQTT_BROKER_HOST = os.getenv('MQTT_BROKER_HOST')
 MQTT_BROKER_PORT = int(os.getenv('MQTT_BROKER_PORT', 1883))
 MQTT_CLIENT_ID = os.getenv('MQTT_CLIENT_ID', 'mail-and-packages-2')
 MQTT_USERNAME = os.getenv('MQTT_USERNAME', '')
 MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', '')
 MQTT_TOPIC_PREFIX = os.getenv('MQTT_TOPIC_PREFIX', 'mail-and-packages-2')
+
+if not MQTT_BROKER_HOST:
+    logging.critical('Missing the MQTT_BROKER_HOST environment variable')
+    sys.exit(1)
 
 client = mqtt.Client(client_id=MQTT_CLIENT_ID)
 if MQTT_USERNAME and MQTT_PASSWORD:
