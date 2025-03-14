@@ -4,6 +4,7 @@ import os
 import pickle
 import sys
 import time
+import traceback
 
 from redis import Redis
 
@@ -32,18 +33,24 @@ def main(args):
     redis = Redis(host='localhost', port=6379, db=0)
     while True:
         if PARCELSAPP_KEY:
-            logging.info('Fetching USPS tracking data...')
-            IMAPConnection.initialise(IMAP_HOST, IMAP_USERNAME, IMAP_PASSWORD)
-            usps_arriving_today, usps_delivered_today, usps_recent_tracking_ids = get_usps_packages_arriving_today(IMAP_FOLDER, PARCELSAPP_KEY, args.usps_mode)
-            IMAPConnection.close_connection()
-            redis.set('usps_packages', pickle.dumps((usps_arriving_today, usps_delivered_today, usps_recent_tracking_ids)))
-            logging.info(f'USPS: {usps_arriving_today} arriving, {usps_delivered_today} delivered')
+            try:
+                logging.info('Fetching USPS tracking data...')
+                IMAPConnection.initialise(IMAP_HOST, IMAP_USERNAME, IMAP_PASSWORD)
+                usps_arriving_today, usps_delivered_today, usps_recent_tracking_ids = get_usps_packages_arriving_today(IMAP_FOLDER, PARCELSAPP_KEY, args.usps_mode)
+                IMAPConnection.close_connection()
+                redis.set('usps_packages', pickle.dumps((usps_arriving_today, usps_delivered_today, usps_recent_tracking_ids)))
+                logging.info(f'USPS: {usps_arriving_today} arriving, {usps_delivered_today} delivered')
+            except:
+                logging.error(f'Failed to fetch USPS tracking data:\n{traceback.format_exc()}')
 
         if AMAZON_USERNAME and AMAZON_PASSWORD:
-            logging.info('Fetching Amazon order statuses...')
-            amazon_packages_count, amazon_delivered_today, amazon_packages_items = get_amazon_packages_arriving_today(AMAZON_USERNAME, AMAZON_PASSWORD)
-            redis.set('amazon_packages', pickle.dumps((amazon_packages_count, amazon_delivered_today, amazon_packages_items)))
-            logging.info(f'AMAZON: {amazon_packages_count} arriving, {amazon_delivered_today} delivered')
+            try:
+                logging.info('Fetching Amazon order statuses...')
+                amazon_packages_count, amazon_delivered_today, amazon_packages_items = get_amazon_packages_arriving_today(AMAZON_USERNAME, AMAZON_PASSWORD)
+                redis.set('amazon_packages', pickle.dumps((amazon_packages_count, amazon_delivered_today, amazon_packages_items)))
+                logging.info(f'AMAZON: {amazon_packages_count} arriving, {amazon_delivered_today} delivered')
+            except:
+                logging.error(f'Failed to fetch Amazon tracking data:\n{traceback.format_exc()}')
 
         logging.info('Sleeping')
         time.sleep(900)  # 15 minutes
