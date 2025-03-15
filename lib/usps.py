@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 from enum import Enum
@@ -5,8 +6,8 @@ from enum import Enum
 from dateutil.parser import parse
 from func_timeout import func_timeout
 
-from lib.imap.search import fetch_emails_last_3_days
-from lib.parcelsapp import fetch_parcel_data, parcelsapp_get_attr
+from lib.imap.search import fetch_emails_last_n_days
+from lib.parcelsapp import fetch_parcel_data
 
 _LOGGER = logging.getLogger('USPS')
 
@@ -69,7 +70,7 @@ def get_usps_packages_arriving_today(folder: str, api_key: str, api_type: str):
 
 
 def usps_fetch_items_from_emails(folder: str) -> set:
-    emails = fetch_emails_last_3_days('auto-reply@usps.com', folder)
+    emails = fetch_emails_last_n_days(sender='auto-reply@usps.com', folder=folder)
     items = set()
     for email in emails:
         tracking_id = re.search(r'\b(9\d{15,21})\b', email.subject)
@@ -81,12 +82,16 @@ def usps_fetch_items_from_emails(folder: str) -> set:
 def usps_parcel_app(tracking_id: str, api_key: str):
     item = UspsItem(tracking_id=tracking_id)
     data = fetch_parcel_data(api_key, [tracking_id])
-    eta = parcelsapp_get_attr(data, 'eta')
+    print(json.dumps(data))
+
+    # eta = parcelsapp_get_attr(data, 'eta')
+    eta = data.get('delivered_by')
     if data.get('error'):
         _LOGGER.warning(f'Parcel API error for tracking code "{tracking_id}": {data["error"]}')
     elif data['status'] == 'delivered':
         item.delivered_date = parse(data['lastState']['date'])
     elif eta is not None:
-        item.arriving_date = parse(eta[1])
+        # item.arriving_date = parse(eta[1])
+        item.arriving_date = datetime.strptime(eta, '%Y-%m-%dT%H:%M:%SZ')
 
     return item

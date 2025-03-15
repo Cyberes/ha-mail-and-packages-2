@@ -34,7 +34,6 @@ class PackageTrackerCard extends HTMLElement {
         const uspsDelivered = parseInt(hass.states['sensor.usps_delivered_count']?.state) || 0;
         const uspsArriving = (parseInt(hass.states['sensor.usps_arriving_count']?.state) || 0) + uspsDelivered;
         const uspsItems = (hass.states['sensor.usps_arriving_count']?.attributes.tracking_ids || []);
-
         let uspsTrackingUrl;
         if (uspsArriving === 0) {
             uspsTrackingUrl = 'https://informeddelivery.usps.com/box/pages/secure/DashboardAction_input.action';
