@@ -82,7 +82,7 @@ def usps_fetch_items_from_emails(folder: str) -> set:
 def usps_parcel_app(tracking_id: str, api_key: str):
     item = UspsItem(tracking_id=tracking_id)
     data = fetch_parcel_data(api_key, [tracking_id])
-    print(json.dumps(data))
+    _LOGGER.info(json.dumps(data))
 
     # eta = parcelsapp_get_attr(data, 'eta')
     eta = data.get('delivered_by')
