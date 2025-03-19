@@ -42,6 +42,8 @@ Visit [developers.usps.com](https://developers.usps.com) and create a new app. Y
 
 Depending on the backlog, it can take a few weeks to a few months to get granted access.
 
+The native USPS API may serve more up to date data versus parcelsapp. But parcelsapp is good enough.
+
 ## Install
 
 1. `pip install -r requirements.txt`

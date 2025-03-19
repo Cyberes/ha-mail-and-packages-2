@@ -8,6 +8,8 @@ import time
 import paho.mqtt.client as mqtt
 from redis import Redis
 
+from lib.consts import REDIS_DB, REDIS_USPS_KEY, REDIS_AMAZON_KEY
+
 logging.basicConfig(level=logging.INFO)
 
 MQTT_BROKER_HOST = os.getenv('MQTT_BROKER_HOST')
@@ -47,13 +49,14 @@ def publish(topic: str, msg: str, attributes: dict = None):
 
 
 def main():
-    redis = Redis(host='localhost', port=6379, db=0)
-    amazon_data = redis.get('amazon_packages')
-    usps_data = redis.get('usps_packages')
+    redis = Redis(db=REDIS_DB)
+    amazon_data: bytes = redis.get(REDIS_AMAZON_KEY)
+    usps_data: bytes = redis.get(REDIS_USPS_KEY)
     while amazon_data is None or usps_data is None:
         logging.warning('Redis has not been populated yet. Is cache.py running? Sleeping 10s...')
         time.sleep(10)
-        amazon_data = redis.get('amazon_packages')
+        amazon_data = redis.get(REDIS_AMAZON_KEY)
+        usps_data = redis.get(REDIS_USPS_KEY)
     amazon_arriving_count, amazon_delivered_count, amazon_packages_items = pickle.loads(amazon_data)
     publish('amazon-arriving-count', amazon_arriving_count, attributes={'items': amazon_packages_items})
     publish('amazon-delivered-count', amazon_delivered_count)
