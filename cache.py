@@ -44,7 +44,6 @@ def main(args):
             try:
                 logging.info('Fetching USPS tracking data...')
                 usps_arriving_today, usps_delivered_today, usps_recent_tracking_ids = get_usps_packages_arriving_today(IMAP_FOLDER, PARCELSAPP_KEY, args.usps_mode)
-                IMAPConnection.close_connection()
                 logging.info(f'USPS: {usps_arriving_today} arriving, {usps_delivered_today} delivered')
             except:
                 encountered_error = True

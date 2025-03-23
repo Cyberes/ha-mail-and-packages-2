@@ -40,6 +40,8 @@ If you use Ground Advantage with a 3.5x5 package this should cost about $85.
 Visit [developers.usps.com](https://developers.usps.com) and create a new app. You will need the `Consumer Key` and
 `Consumer Secret` values.
 
+You'll also access info via the [Business Customer Gateway](https://gateway.usps.com/eAdmin/view/signin). 
+
 Depending on the backlog, it can take a few weeks to a few months to get granted access.
 
 The native USPS API may serve more up to date data versus parcelsapp. But parcelsapp is good enough.
