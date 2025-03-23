@@ -66,7 +66,7 @@ def get_usps_packages_arriving_today(folder: str, api_key: str, api_type: str):
         return len(arriving_today), len(delivered_today), upcoming_tracking_ids + delivered_tracking_ids
 
     # Prevent the IMAP call from freezing and stopping everything.
-    return func_timeout(30, run)
+    return func_timeout(60, run)
 
 
 def usps_fetch_items_from_emails(folder: str) -> set:
@@ -84,15 +84,17 @@ def usps_parcel_app(tracking_id: str, api_key: str):
     data = fetch_parcel_data(api_key, [tracking_id])
 
     # TODO: dumping state to see what the "status" tag shows when out for delivery
-    _LOGGER.info(json.dumps(data))
+    if data['status'] != 'delivered':
+        _LOGGER.info(json.dumps(data))
 
     eta = data.get('delivered_by')
     if data.get('error'):
         _LOGGER.warning(f'Parcel API error for tracking code "{tracking_id}": {data["error"]}')
     elif data['status'] == 'delivered':
         item.delivered_date = parse(data['lastState']['date'])
-    # TODO: need to figure out what the status looks like when its out for delivery. Then, set arriving_date to today
-    # elif something:
+    elif data['status'] == 'pickup':
+        # TODO: need to test more packages to confirm what the status looks like when its out for delivery
+        item.arriving_date = date.today()
     elif eta is not None:
         item.arriving_date = datetime.strptime(eta, '%Y-%m-%dT%H:%M:%SZ')
 

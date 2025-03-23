@@ -10,7 +10,7 @@ EnvironmentFile=/etc/secrets/mail-and-packages
 ExecStart=/srv/ha-mail-and-packges-2/venv/bin/python /srv/ha-mail-and-packges-2/cache.py
 SyslogIdentifier=mail-and-packages-cache
 Restart=always
-RestartSec=60s
+RestartSec=300s
 
 [Install]
 WantedBy=multi-user.target

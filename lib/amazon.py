@@ -28,16 +28,22 @@ def relative_date_to_date(text: str) -> date | None:
             return delivered_date
         except ValueError:
             pass
-    elif 'arriving' in text_lower and len(text_lower.split(' ')) > 2:
+    elif ('arriving' in text_lower or 'expected' in text_lower) and len(text_lower.split(' ')) > 2:
         if 'overnight' in text_lower:
             return datetime.today() + timedelta(days=1)
-        else:
+
+        if 'expected' in text_lower:
+            date_text = text_lower.replace('now expected by ', '').strip()
+        elif 'arriving' in text_lower:
             date_range = text_lower.replace('arriving', '').strip()
-            start_date_str = date_range.split('-')[0]
-            try:
-                return datetime.strptime(start_date_str.strip(), '%B %d').date().replace(year=today.year)
-            except ValueError:
-                raise ValueError(f'Failed to parse date: "{text_lower}"\n{traceback.format_exc()}')
+            date_text = date_range.split('-')[0]
+        else:
+            date_text = text_lower
+
+        try:
+            return datetime.strptime(date_text.strip(), '%B %d').date().replace(year=today.year)
+        except ValueError:
+            raise ValueError(f'Failed to parse date: "{text_lower}"\n{traceback.format_exc()}')
     elif text_lower == 'cannot display current status':
         return None
     else:
@@ -56,7 +62,7 @@ def relative_date_to_date(text: str) -> date | None:
                 if days_ahead <= 0:
                     days_ahead += 7
                 return (today + timedelta(days=days_ahead)).date()
-    raise ValueError(f"Unrecognized date text: '{text}'")
+    raise ValueError(f'Unrecognized date text: "{text}"')
 
 
 def get_amazon_session(username: str, password: str) -> AmazonSession:
@@ -79,7 +85,6 @@ def get_amazon_session(username: str, password: str) -> AmazonSession:
     else:
         _LOGGER.info('Amazon session already authenticated')
 
-    # TODO: https://github.com/alexdlaird/amazon-orders/issues/49
     _REDIS.set('amazon_session', pickle.dumps(amazon_session))
     _LOGGER.info('Cached Amazon session')
 
