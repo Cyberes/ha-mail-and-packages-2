@@ -44,7 +44,7 @@ def relative_date_to_date(text: str) -> date | None:
             return datetime.strptime(date_text.strip(), '%B %d').date().replace(year=today.year)
         except ValueError:
             raise ValueError(f'Failed to parse date: "{text_lower}"\n{traceback.format_exc()}')
-    elif text_lower == 'cannot display current status':
+    elif text_lower in ['cannot display current status', 'your package may be lost']:
         return None
     else:
         weekdays = {
