@@ -1,4 +1,5 @@
 import email
+import re
 from datetime import datetime, timedelta
 
 from lib.imap.connection import IMAPConnectionHandler
@@ -23,3 +24,14 @@ def fetch_emails_last_n_days(days: int = 14, sender: str = None, folder: str = N
             emails.append(email_obj)
 
     return emails
+
+
+def search_subject_for_regex(from_email: str, folder: str, regex: str):
+    emails = fetch_emails_last_n_days(sender=from_email, folder=folder)
+    items = set()
+    for item in emails:
+        tracking_id = re.search(regex, item.subject)
+        if tracking_id:
+            items.add(tracking_id.group(1))
+            break
+    return items

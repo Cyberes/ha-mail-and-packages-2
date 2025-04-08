@@ -1,5 +1,7 @@
 import logging
 import time
+import traceback
+from typing import List
 
 import requests
 
@@ -8,7 +10,7 @@ _logger = logging.getLogger('PARCELSAPP')
 _API_URL = 'https://parcelsapp.com/api/v3/shipments/tracking'
 
 
-def fetch_parcel_data(api_key: str, tracking_ids: list):
+def fetch_parcel_data(api_key: str, tracking_ids: List[str]):
     """
     https://parcelsapp.com/api-docs
     """
@@ -32,7 +34,10 @@ def fetch_parcel_data(api_key: str, tracking_ids: list):
         tracking_data = post_data
 
     if len(tracking_ids) == 1:
-        return tracking_data['shipments'][0]
+        try:
+            return tracking_data['shipments'][0]
+        except:
+            _logger.error(f'Failed to get tracking data for {tracking_ids}:\n{traceback.format_exc()}')
     return tracking_data
 
 

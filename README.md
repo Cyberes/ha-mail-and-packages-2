@@ -9,6 +9,8 @@ having endless issues, so I wrote my own package summary addon.
 Runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
 because the dependencies require a very specific setup.
 
+The goal of this project is to fetch data via APIs instead of parsing emails.
+
 ### Amazon
 
 Uses [alexdlaird/amazon-orders](https://github.com/alexdlaird/amazon-orders) to fetch order delivery dates instead of
@@ -32,7 +34,7 @@ USPS packages can be tracked via parcelsapp or using the official USPS tracking 
 arg and defaults to using parcelsapp.
 
 The USPS tracking API requires a business account with valid `TRACKING` API scope access. In order to be eligible for
-this scope, you must send 20 tracked packages then email `APISUPPORT@usps.gov` with your CRID 
+this scope, you must send 20 tracked packages then email `APISUPPORT@usps.gov` with your CRID
 (found [here](https://developers.usps.com/user)) and list of tracking numbers. You are building an online platform and
 need access as part of the technology development phase (as long as you are shipping with USPS your use case is valid).
 If you use Ground Advantage with a 3.5x5 package this should cost about $85.
@@ -40,7 +42,7 @@ If you use Ground Advantage with a 3.5x5 package this should cost about $85.
 Visit [developers.usps.com](https://developers.usps.com) and create a new app. You will need the `Consumer Key` and
 `Consumer Secret` values.
 
-You'll also access info via the [Business Customer Gateway](https://gateway.usps.com/eAdmin/view/signin). 
+You'll also access info via the [Business Customer Gateway](https://gateway.usps.com/eAdmin/view/signin).
 
 Depending on the backlog, it can take a few weeks to a few months to get granted access.
 
@@ -80,6 +82,17 @@ mqtt:
       state_topic: "mail-and-packages-2/usps-delivered-count"
       state_class: measurement
       unique_id: usps_delivered_count
+      unit_of_measurement: "packages"
+    - name: "Fedex Arriving Count"
+      state_topic: "mail-and-packages-2/fedex-arriving-count"
+      json_attributes_topic: "mail-and-packages-2/fedex-arriving-count/attributes"
+      state_class: measurement
+      unique_id: fedex_arriving_count
+      unit_of_measurement: "packages"
+    - name: "Fedex Delivered Count"
+      state_topic: "mail-and-packages-2/fedex-delivered-count"
+      state_class: measurement
+      unique_id: fedex_delivered_count
       unit_of_measurement: "packages"
 ```
 
