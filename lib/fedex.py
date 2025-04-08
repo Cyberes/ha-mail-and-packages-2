@@ -13,6 +13,9 @@ def get_fedex_packages_arriving_today(folder: str, api_key: str):
         _LOGGER.info('Searching for Fedex emails...')
         tracking_ids = set()
         for email in fetch_emails_last_n_days(14, 'TrackingUpdates@fedex.com', folder):
+            email_sender_name = [x.strip('>').strip(' ').replace('"', '') for x in email.sender.split('<')][0]
+            if email_sender_name == 'TrackingUpdates@fedex.com':
+                continue
             # Fedex emails always put the tracking number at the end of the subject.
             tracking_ids.add(email.subject.split(' ')[-1])
 
