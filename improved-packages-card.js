@@ -1,29 +1,17 @@
 class PackageTrackerCard extends HTMLElement {
-    setConfig(config) {
-        this.config = config;
-
-        // Variable that is hopefully outside the card refresh
-        // scope to prevent the collapse from closing when it's refreshed.
-        this.amazonCollapseOpen = false;
-    }
-
-    getCardSize() {
-        return 3;
-    }
-
     set hass(hass) {
-        const amazonDelivered = parseInt(hass.states['sensor.amazon_delivered_count']?.state) || 0;
-        const amazonArriving = (parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0)
+        const amazonDeliveredCount = parseInt(hass.states['sensor.amazon_delivered_count']?.state) || 0;
+        const amazonTotalCount = (parseInt(hass.states['sensor.amazon_arriving_count']?.state) || 0)
             // Add the number of arriving packages to the delivered ones so we get a correct n/N number.
-            + amazonDelivered;
+            + amazonDeliveredCount;
         const amazonItems = (hass.states['sensor.amazon_arriving_count']?.attributes.items || []).join(', ');
         let amazonPackageStr;
-        let amazonPackageItemsStr = "";
-        if (amazonArriving === 0) {
-            amazonPackageStr = `<div class="improved-packages-counts">no packages</div>`;
+        let amazonPackageItemsHtml = "";
+        if (amazonTotalCount === 0) {
+            amazonPackageStr = `no packages`;
         } else {
-            amazonPackageStr = `<div class="improved-packages-counts">${amazonDelivered}/${amazonArriving}</div>`;
-            amazonPackageItemsStr = `
+            amazonPackageStr = `${amazonDeliveredCount}/${amazonTotalCount}`;
+            amazonPackageItemsHtml = `
                 <div class="improved-packages-amazon-items">
                     <button class="improved-packages-toggle-items-btn${this.amazonCollapseOpen ? ' open' : ''}">Incoming Items</button>
                     <div class="improved-packages-amazon-items-list${this.amazonCollapseOpen ? ' show' : ''}">${amazonItems}</div>
@@ -31,40 +19,41 @@ class PackageTrackerCard extends HTMLElement {
             `;
         }
 
-        const uspsDelivered = parseInt(hass.states['sensor.usps_delivered_count']?.state) || 0;
-        const uspsArriving = (parseInt(hass.states['sensor.usps_arriving_count']?.state) || 0) + uspsDelivered;
-        const uspsItems = (hass.states['sensor.usps_arriving_count']?.attributes.tracking_ids || []);
-        let uspsTrackingUrl;
-        if (uspsArriving === 0) {
+        const uspsDeliveredCount = parseInt(hass.states['sensor.usps_delivered_count']?.state) || 0;
+        const uspsTotalCount = (parseInt(hass.states['sensor.usps_arriving_count']?.state) || 0) + uspsDeliveredCount;
+        const uspsTrackingIds = (hass.states['sensor.usps_arriving_count']?.attributes.tracking_ids || []);
+        let uspsTrackingUrl, uspsTrackingStr;
+        if (uspsTotalCount === 0) {
             uspsTrackingUrl = 'https://informeddelivery.usps.com/box/pages/secure/DashboardAction_input.action';
+            uspsTrackingStr = `no packages`
         } else {
             const baseUrl = 'https://tools.usps.com/go/TrackConfirmAction?tLabels=';
-            const trackingParam = uspsItems.join('%2C') + '%2C';
+            const trackingParam = uspsTrackingIds.join('%2C') + '%2C';
             uspsTrackingUrl = `${baseUrl}${trackingParam}`;
-        }
-        let uspsPackageStr
-        if (uspsArriving === 0) {
-            uspsPackageStr = `<div class="improved-packages-counts">no packages</div>`
-        } else {
-            uspsPackageStr = `<div class="improved-packages-counts">${uspsDelivered}/${uspsArriving}</div>`
+            uspsTrackingStr = `${uspsDeliveredCount}/${uspsTotalCount}`;
         }
 
-        const fedexDelivered = parseInt(hass.states['sensor.mail_fedex_delivered']?.state) || 0;
-        const fedexArriving = (parseInt(hass.states['sensor.mail_fedex_delivering']?.state) || 0) + fedexDelivered;
-        let fedexPackageStr
-        if (fedexArriving === 0) {
-            fedexPackageStr = `<div class="improved-packages-counts improved-packages-no-packages-str">no packages</div>`
+        const fedexDeliveredCount = parseInt(hass.states['sensor.mail_fedex_delivered_count']?.state) || 0;
+        const fedexTotalCount = (parseInt(hass.states['sensor.mail_fedex_arriving_count']?.state) || 0) + fedexDeliveredCount;
+        const fedexTrackingIds = (hass.states['sensor.mail_fedex_arriving_count']?.attributes.tracking_ids || []);
+        let fedexTrackingUrl, fedexTrackingStr;
+        if (fedexTotalCount === 0) {
+            fedexTrackingUrl = 'https://www.fedex.com/fedextracking/'
+            fedexTrackingStr = `no packages`;
         } else {
-            fedexPackageStr = `<div class="improved-packages-counts">${fedexDelivered}/${fedexArriving}</div>`
+            const baseUrl = 'https://www.fedex.com/fedextrack/?trknbr=';
+            const trackingParam = fedexTrackingIds.join(',');
+            fedexTrackingUrl = `${baseUrl}${trackingParam}`;
+            fedexTrackingStr = `${fedexDeliveredCount}/${fedexTotalCount}`;
         }
 
         const upsDelivered = parseInt(hass.states['sensor.mail_ups_delivered']?.state) || 0;
-        const upsArriving = (parseInt(hass.states['sensor.mail_ups_delivering']?.state) || 0) + upsDelivered;
+        const upsTotalCount = (parseInt(hass.states['sensor.mail_ups_delivering']?.state) || 0) + upsDelivered;
         let upsPackageStr
-        if (upsArriving === 0) {
-            upsPackageStr = `<div class="improved-packages-counts improved-packages-no-packages-str">no packages</div>`
+        if (upsTotalCount === 0) {
+            upsPackageStr = `no packages`
         } else {
-            upsPackageStr = `<div class="improved-packages-counts">${upsDelivered}/${upsArriving}</div>`
+            upsPackageStr = `${upsDelivered}/${upsTotalCount}`
         }
 
         this.innerHTML = `
@@ -82,25 +71,28 @@ class PackageTrackerCard extends HTMLElement {
             }
 
             .improved-packages-service-container {
-              display: flex;
-              justify-content: space-around;
-              flex-wrap: wrap;
-              gap: 16px;
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                gap: 16px;
             }
 
+            @media (min-width: 600px) {
+                .improved-packages-service-container {
+                    flex-wrap: nowrap;
+                }
+            }
+            
             .improved-packages-service {
-              flex: 1 1 100px;
-              text-align: center;
+                flex: 1 1 0;
+                text-align: center;
+                min-width: 100px;
             }
-
+            
             .improved-packages-service-name {
               font-weight: 600;
               margin-bottom: 8px;
               font-size: 13pt;
-            }
-
-            .improved-packages-counts {
-              font-size: 16px;
             }
 
             .improved-packages-no-packages-str {
@@ -111,6 +103,7 @@ class PackageTrackerCard extends HTMLElement {
             .improved-packages-status-link {
               color: var(--primary-text-color);
               text-decoration: none;
+              font-size: 16px;
             }
 
             .improved-packages-status-link.improved-packages-no-packages-str {
@@ -181,47 +174,39 @@ class PackageTrackerCard extends HTMLElement {
             .improved-packages-toggle-items-btn.open::after {
               transform: rotate(180deg);
             }
-
-            @media (min-width: 600px) {
-              .improved-packages-service-container {
-                flex-wrap: nowrap;
-              }
-            }
           </style>
-            <ha-card>
-                <div class="improved-packages-card">
-                    ${
+          <ha-card>
+              <div class="improved-packages-card">
+                  ${
             this.config.title != null && this.config.title !== "undefined" && this.config.title !== "null"
                 ? `<div class="improved-packages-header">${this.config.title}</div>`
                 : ""
         }
-                    <div style="margin-bottom:16px">
-                        <div class="improved-packages-service">
-                            <div class="improved-packages-service-name">Amazon</div>
-                            <a href="https://www.amazon.com/gp/css/order-history" target="_blank" class="improved-packages-status-link ${amazonArriving === 0 ? 'improved-packages-no-packages-str' : ''}">${amazonPackageStr}</a>
-                            ${amazonPackageItemsStr}
-                        </div>
+                  <div class="improved-packages-service-container" style="margin-bottom:16px">
+                    <div class="improved-packages-service">
+                      <div class="improved-packages-service-name">Amazon</div>
+                      <a href="https://www.amazon.com/gp/css/order-history" target="_blank" class="improved-packages-status-link ${amazonTotalCount === 0 ? 'improved-packages-no-packages-str' : ''}">${amazonPackageStr}</a>
+                      ${amazonPackageItemsHtml}
                     </div>
-                    <div>
-                        <div class="improved-packages-service-container">
-                            <div class="improved-packages-service">
-                                <div class="improved-packages-service-name">USPS</div>
-                            <a href="${uspsTrackingUrl}" target="_blank" class="improved-packages-status-link ${uspsArriving === 0 ? 'improved-packages-no-packages-str' : ''}">${uspsPackageStr}</a>
-                            </div>
-
-                            <div class="improved-packages-service">
-                                <div class="improved-packages-service-name">FedEx</div>
-                                ${fedexPackageStr}
-                            </div>
-
-                            <div class="improved-packages-service">
-                                <div class="improved-packages-service-name">UPS</div>
-                                ${upsPackageStr}
-                            </div>
-                        </div>
+                  </div>
+                  <div class="improved-packages-service-container">
+                    <div class="improved-packages-service">
+                      <div class="improved-packages-service-name">USPS</div>
+                      <a href="${uspsTrackingUrl}" target="_blank" class="improved-packages-status-link ${uspsTotalCount === 0 ? 'improved-packages-no-packages-str' : ''}">${uspsTrackingStr}</a>
                     </div>
-                </div>
-            </ha-card>
+              
+                    <div class="improved-packages-service">
+                      <div class="improved-packages-service-name">FedEx</div>
+                      <a href="${fedexTrackingUrl}" target="_blank" class="improved-packages-status-link ${fedexTotalCount === 0 ? 'improved-packages-no-packages-str' : ''}">${fedexTrackingStr}</a>
+                    </div>
+              
+                    <div class="improved-packages-service">
+                      <div class="improved-packages-service-name">UPS</div>
+                      ${upsPackageStr}
+                    </div>
+                  </div>
+              </div>
+          </ha-card>
         `;
 
         const toggleItemsBtn = this.querySelector('.improved-packages-toggle-items-btn');
@@ -233,6 +218,18 @@ class PackageTrackerCard extends HTMLElement {
                 toggleItemsBtn.classList.toggle('open', this.amazonCollapseOpen);
             });
         }
+    }
+
+    setConfig(config) {
+        this.config = config;
+
+        // Variable that is hopefully outside the card refresh
+        // scope to prevent the collapse from closing when it's refreshed.
+        this.amazonCollapseOpen = false;
+    }
+
+    getCardSize() {
+        return 3;
     }
 }
 
