@@ -42,8 +42,7 @@ def process_tracking_ids(tracking_ids: Set[str], api_key: str, carrier: str):
         elif item.delivered_date is not None:
             if item.delivered_date == date.today():
                 delivered_today.append(item)
-            else:
-                carrier_logger.info(f'{item.tracking_id} delivered on {item.delivered_date}')
+            carrier_logger.info(f'{item.tracking_id} delivered on {item.delivered_date}')
         elif item.arriving_date is not None and item.arriving_date > date.today():
             carrier_logger.info(f'{item.tracking_id} arriving on {item.arriving_date} ({(item.arriving_date - date.today()).days} days)')
 
@@ -58,6 +57,9 @@ def process_tracking_ids(tracking_ids: Set[str], api_key: str, carrier: str):
 def parse_parcelapp_tracking(tracking_id: str, api_key: str):
     item = TrackedPackage(tracking_id=tracking_id)
     data = fetch_parcel_data(api_key, [tracking_id])
+
+    if 'status' not in data.keys():
+        raise KeyError(f'Bad parcelsapp JSON:\n{json.dumps(data)}')
 
     if data['status'] not in ['delivered', 'transit']:
         _LOGGER.info(json.dumps(data))

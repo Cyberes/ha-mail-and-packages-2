@@ -94,6 +94,17 @@ mqtt:
       state_class: measurement
       unique_id: fedex_delivered_count
       unit_of_measurement: "packages"
+    - name: "UPS Arriving Count"
+      state_topic: "mail-and-packages-2/ups-arriving-count"
+      json_attributes_topic: "mail-and-packages-2/ups-arriving-count/attributes"
+      state_class: measurement
+      unique_id: ups_arriving_count
+      unit_of_measurement: "packages"
+    - name: "UPS Delivered Count"
+      state_topic: "mail-and-packages-2/ups-delivered-count"
+      state_class: measurement
+      unique_id: ups_delivered_count
+      unit_of_measurement: "packages"
 ```
 
 ### Dashboard Card

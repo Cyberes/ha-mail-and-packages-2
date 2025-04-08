@@ -9,9 +9,10 @@ import traceback
 from redis import Redis
 
 from lib.amazon import get_amazon_packages_arriving_today
-from lib.consts import REDIS_USPS_KEY, REDIS_DB, REDIS_AMAZON_KEY, REDIS_FEDEX_KEY
+from lib.consts import REDIS_DB, REDIS_AMAZON_KEY, REDIS_UPS_KEY, REDIS_USPS_KEY, REDIS_FEDEX_KEY
 from lib.fedex import get_fedex_packages_arriving_today
 from lib.imap.connection import IMAPConnection
+from lib.ups import get_ups_packages_arriving_today
 from lib.usps import get_usps_packages_arriving_today
 
 logging.basicConfig(level=logging.INFO)
@@ -61,6 +62,17 @@ def main(args):
                 encountered_error = True
                 logging.error(f'Failed to fetch USPS tracking data:\n{traceback.format_exc()}')
             redis.set(REDIS_FEDEX_KEY, pickle.dumps((fedex_arriving_count, fedex_delivered_count, fedex_recent_tracking_ids)))
+
+            ## UPS ##
+            ups_arriving_count = ups_delivered_count = -1
+            ups_recent_tracking_ids = []
+            try:
+                ups_arriving_count, ups_delivered_count, ups_recent_tracking_ids = get_ups_packages_arriving_today(IMAP_FOLDER, PARCELSAPP_KEY)
+                logging.info(f'UPS: {ups_arriving_count} arriving today, {ups_delivered_count} delivered')
+            except:
+                encountered_error = True
+                logging.error(f'Failed to fetch USPS tracking data:\n{traceback.format_exc()}')
+            redis.set(REDIS_UPS_KEY, pickle.dumps((ups_arriving_count, ups_delivered_count, ups_recent_tracking_ids)))
 
         ## Amazon ##
         if AMAZON_USERNAME and AMAZON_PASSWORD:

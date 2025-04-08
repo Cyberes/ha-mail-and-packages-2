@@ -8,7 +8,7 @@ import time
 import paho.mqtt.client as mqtt
 from redis import Redis
 
-from lib.consts import REDIS_DB, REDIS_USPS_KEY, REDIS_AMAZON_KEY, REDIS_FEDEX_KEY
+from lib.consts import REDIS_DB, REDIS_USPS_KEY, REDIS_AMAZON_KEY, REDIS_FEDEX_KEY, REDIS_UPS_KEY
 
 logging.basicConfig(level=logging.INFO)
 
@@ -53,12 +53,14 @@ def main():
     amazon_data: bytes = redis.get(REDIS_AMAZON_KEY)
     usps_data: bytes = redis.get(REDIS_USPS_KEY)
     fedex_data: bytes = redis.get(REDIS_FEDEX_KEY)
+    ups_data: bytes = redis.get(REDIS_UPS_KEY)
     while amazon_data is None or usps_data is None:
         logging.warning('Redis has not been populated yet. Is cache.py running? Sleeping 10s...')
         time.sleep(10)
         amazon_data = redis.get(REDIS_AMAZON_KEY)
         usps_data = redis.get(REDIS_USPS_KEY)
         fedex_data = redis.get(REDIS_FEDEX_KEY)
+        ups_data = redis.get(REDIS_UPS_KEY)
     amazon_arriving_count, amazon_delivered_count, amazon_packages_items = pickle.loads(amazon_data)
     publish('amazon-arriving-count', amazon_arriving_count, attributes={'items': amazon_packages_items})
     publish('amazon-delivered-count', amazon_delivered_count)
@@ -68,6 +70,9 @@ def main():
     fedex_arriving_count, fedex_delivered_count, fedex_recent_tracking_ids = pickle.loads(fedex_data)
     publish('fedex-arriving-count', fedex_arriving_count, attributes={'tracking_ids': fedex_recent_tracking_ids})
     publish('fedex-delivered-count', fedex_delivered_count)
+    ups_arriving_count, ups_delivered_count, ups_recent_tracking_ids = pickle.loads(ups_data)
+    publish('ups-arriving-count', ups_arriving_count, attributes={'tracking_ids': ups_recent_tracking_ids})
+    publish('ups-delivered-count', ups_delivered_count)
 
 
 if __name__ == '__main__':

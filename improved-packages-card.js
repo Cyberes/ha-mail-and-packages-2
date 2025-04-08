@@ -33,9 +33,9 @@ class PackageTrackerCard extends HTMLElement {
             uspsTrackingStr = `${uspsDeliveredCount}/${uspsTotalCount}`;
         }
 
-        const fedexDeliveredCount = parseInt(hass.states['sensor.mail_fedex_delivered_count']?.state) || 0;
-        const fedexTotalCount = (parseInt(hass.states['sensor.mail_fedex_arriving_count']?.state) || 0) + fedexDeliveredCount;
-        const fedexTrackingIds = (hass.states['sensor.mail_fedex_arriving_count']?.attributes.tracking_ids || []);
+        const fedexDeliveredCount = parseInt(hass.states['sensor.fedex_delivered_count']?.state) || 0;
+        const fedexTotalCount = (parseInt(hass.states['sensor.fedex_arriving_count']?.state) || 0) + fedexDeliveredCount;
+        const fedexTrackingIds = (hass.states['sensor.fedex_arriving_count']?.attributes.tracking_ids || []);
         let fedexTrackingUrl, fedexTrackingStr;
         if (fedexTotalCount === 0) {
             fedexTrackingUrl = 'https://www.fedex.com/fedextracking/'
@@ -47,13 +47,18 @@ class PackageTrackerCard extends HTMLElement {
             fedexTrackingStr = `${fedexDeliveredCount}/${fedexTotalCount}`;
         }
 
-        const upsDelivered = parseInt(hass.states['sensor.mail_ups_delivered']?.state) || 0;
-        const upsTotalCount = (parseInt(hass.states['sensor.mail_ups_delivering']?.state) || 0) + upsDelivered;
-        let upsPackageStr
+        const upsDeliveredCount = parseInt(hass.states['sensor.ups_delivered_count']?.state) || 0;
+        const upsTotalCount = (parseInt(hass.states['sensor.ups_arriving_count']?.state) || 0) + upsDeliveredCount;
+        const upsTrackingIds = (hass.states['sensor.ups_arriving_count']?.attributes.tracking_ids || []);
+        let upsTrackingUrl, upsTrackingStr;
         if (upsTotalCount === 0) {
-            upsPackageStr = `no packages`
+            upsTrackingUrl = 'https://www.ups.com/upsmychoice/'
+            upsTrackingStr = `no packages`
         } else {
-            upsPackageStr = `${upsDelivered}/${upsTotalCount}`
+            const baseUrl = 'https://www.ups.com/track?track=yes&trackNum=';
+            const trackingParam = upsTrackingIds.join('&trackNum=');
+            upsTrackingUrl = `${baseUrl}${trackingParam}`;
+            upsTrackingStr = `${upsDeliveredCount}/${upsTotalCount}`
         }
 
         this.innerHTML = `
@@ -202,7 +207,7 @@ class PackageTrackerCard extends HTMLElement {
               
                     <div class="improved-packages-service">
                       <div class="improved-packages-service-name">UPS</div>
-                      ${upsPackageStr}
+                      <a href="${upsTrackingUrl}" target="_blank" class="improved-packages-status-link ${upsTotalCount === 0 ? 'improved-packages-no-packages-str' : ''}">${upsTrackingStr}</a>
                     </div>
                   </div>
               </div>

@@ -13,8 +13,7 @@ def get_fedex_packages_arriving_today(folder: str, api_key: str):
         _LOGGER.info('Searching for Fedex emails...')
         tracking_ids = set()
         for email in fetch_emails_last_n_days(14, 'TrackingUpdates@fedex.com', folder):
-            # Fedex has a million different tracking ID formats but they are always the last item in the subject.
-            # We'll just feed whatever it is into the API.
+            # Fedex emails always put the tracking number at the end of the subject.
             tracking_ids.add(email.subject.split(' ')[-1])
 
         return process_tracking_ids(tracking_ids, api_key, 'Fedex')
