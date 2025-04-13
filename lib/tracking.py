@@ -69,6 +69,9 @@ def parse_parcelapp_tracking(tracking_id: str, api_key: str):
         _LOGGER.warning(f'Parcel API error for tracking code "{tracking_id}": {data["error"]}')
     elif data['status'] == 'delivered':
         item.delivered_date = parse(data['lastState']['date'])
+    elif data['detectedCarrier']['slug'].lower() == 'fedex' and 'delivered' in data['lastState']['location'].lower():
+        # API has issues with marking Fedex as delivered.
+        item.delivered_date = parse(data['lastState']['date'])
     elif data['status'] == 'pickup':
         item.arriving_date = date.today()
     elif eta is not None:
