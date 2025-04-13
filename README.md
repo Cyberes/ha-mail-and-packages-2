@@ -4,12 +4,15 @@ _Home Assistant integration giving you a quick summary of what packages are bein
 
 An improved and simplified version
 of [moralmunky/Home-Assistant-Mail-And-Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages). I was
-having endless issues, so I wrote my own package summary addon.
+having endless issues with it, so I wrote my own package summary addon.
 
 Runs on an external server (it's not a Home Assistant integration) and sends data via MQTT
 because the dependencies require a very specific setup.
 
 The goal of this project is to fetch data via APIs instead of parsing emails.
+
+Set up package status emails according
+to [these instructions](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Supported-Shipper-Requirements). All emails should go into one folder.
 
 ### Amazon
 
@@ -24,29 +27,6 @@ bots.
 [parcelsapp.com](https://parcelsapp.com) is used to track all other package providers. Create an account and subscribe
 at [parcelsapp.com/dashboard](https://parcelsapp.com/dashboard).
 
-### USPS
-
-Set up Informed Delivery according
-to [these instructions](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages/wiki/Supported-Shipper-Requirements).
-All package emails should go into one folder. The subject line of all USPS emails is parsed for tracking numbers.
-
-USPS packages can be tracked via parcelsapp or using the official USPS tracking API. Controlled via the `--usps-mode`
-arg and defaults to using parcelsapp.
-
-The USPS tracking API requires a business account with valid `TRACKING` API scope access. In order to be eligible for
-this scope, you must send 20 tracked packages then email `APISUPPORT@usps.gov` with your CRID
-(found [here](https://developers.usps.com/user)) and list of tracking numbers. You are building an online platform and
-need access as part of the technology development phase (as long as you are shipping with USPS your use case is valid).
-If you use Ground Advantage with a 3.5x5 package this should cost about $85.
-
-Visit [developers.usps.com](https://developers.usps.com) and create a new app. You will need the `Consumer Key` and
-`Consumer Secret` values.
-
-You'll also access info via the [Business Customer Gateway](https://gateway.usps.com/eAdmin/view/signin).
-
-Depending on the backlog, it can take a few weeks to a few months to get granted access.
-
-The native USPS API may serve more up to date data versus parcelsapp. But parcelsapp is good enough.
 
 ## Install
 
@@ -120,3 +100,7 @@ To add a title:
 ```yaml
 title: Incoming Packages
 ```
+
+<br>
+
+![dashboard](dashboard%20card.png)
