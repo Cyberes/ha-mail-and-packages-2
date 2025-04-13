@@ -1,6 +1,6 @@
 # ha-mail-and-packages-2
 
-_Home Assistant integration giving you a quick summary of what is being delivered today._
+_Home Assistant integration giving you a quick summary of what packages are being delivered today._
 
 An improved and simplified version
 of [moralmunky/Home-Assistant-Mail-And-Packages](https://github.com/moralmunky/Home-Assistant-Mail-And-Packages). I was
