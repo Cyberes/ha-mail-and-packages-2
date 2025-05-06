@@ -44,9 +44,7 @@ def relative_date_to_date(text: str) -> date | None:
             return datetime.strptime(date_text.strip(), '%B %d').date().replace(year=today.year)
         except ValueError:
             raise ValueError(f'Failed to parse date: "{text_lower}"\n{traceback.format_exc()}')
-    elif text_lower in ['cannot display current status', 'your package may be lost', 'your delivery is still on the way']:
-        return None
-    else:
+    elif any(day in text_lower for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']):
         weekdays = {
             'monday': 0,
             'tuesday': 1,
@@ -62,7 +60,12 @@ def relative_date_to_date(text: str) -> date | None:
                 if days_ahead <= 0:
                     days_ahead += 7
                 return (today + timedelta(days=days_ahead)).date()
-    raise ValueError(f'Unrecognized date text: "{text}"')
+    else:
+        if 'return' in text_lower or 'refund' in text_lower:
+            # Ignore this
+            return None
+        _LOGGER.info(f'Unrecognized date text: "{text_lower}"')
+        return None
 
 
 def get_amazon_session(username: str, password: str) -> AmazonSession:
@@ -96,7 +99,9 @@ def get_amazon_packages_arriving_today(username: str, password: str):
     amazon_orders = AmazonOrders(amazon_session)
     try:
         _LOGGER.info('Fetching Amazon orders...')
-        orders = amazon_orders.get_order_history(year=date.today().year)
+        orders_this_year = amazon_orders.get_order_history(year=date.today().year)
+        orders_last_year = amazon_orders.get_order_history(year=date.today().year - 1)
+        orders = orders_this_year + orders_last_year
         _LOGGER.info(f"Fetched {len(orders)} orders from Amazon.")
     except Exception as e:
         _LOGGER.error(f"Failed to fetch order history: {e}")
@@ -108,10 +113,11 @@ def get_amazon_packages_arriving_today(username: str, password: str):
 
     for order in orders:
         for item in order.shipments:
+            if not item.delivery_status:
+                _LOGGER.debug(f'Got null delivery status for item')
+                continue
             status = item.delivery_status.lower()
             status_str = status.split(' ')[0]
-            if status_str in ['return', 'refunded'] or 'running late' in status or 'problem occurred' in status:
-                continue
             delivery_date = relative_date_to_date(status)
             if delivery_date == date.today():
                 if status_str == 'delivered':
