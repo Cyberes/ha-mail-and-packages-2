@@ -43,9 +43,9 @@ class Email:
         if self.message.is_multipart():
             for part in self.message.walk():
                 if part.get_content_type() == "text/plain":
-                    return part.get_payload(decode=True).decode()
+                    return str(part.get_payload(decode=True).decode())
         else:
-            return self.message.get_payload(decode=True).decode()
+            return str(self.message.get_payload(decode=True).decode())
 
     def _get_html_body(self):
         if self.message.is_multipart():
